@@ -1,3 +1,9 @@
+
+
+# Bug fixes and tweaks to attempt reproduction. So far, imec.py is working as a sample with a Random medium for the context.
+
+# Original README below
+
 # Instructions
 
 ## Pre-requisites
