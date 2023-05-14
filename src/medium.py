@@ -55,7 +55,7 @@ class METEORMedium(Medium):
             self.seed = int.from_bytes(random_data, byteorder="big")
             print("METEORMedium random seed was set to {}".format(self.seed))
 
-        self.model_name = kwargs.get("model_name", "gpt2-large")  # "gpt2-medium")
+        self.model_name = kwargs.get("model_name", "gpt2")  # "gpt2-medium")
         self.logit_temp = kwargs.get("logit_temp", 1.0)
         self.model = kwargs.get("model", None)
         self.enc = kwargs.get("enc", None)
@@ -268,7 +268,7 @@ class RandomMedium(METEORMedium):
             self.seed = int.from_bytes(random_data, byteorder="big")
             print("METEORMedium random seed was set to {}".format(self.seed))
 
-        self.model_name = kwargs.get("model_name", "gpt2-large")  # "gpt2-medium")
+        self.model_name = kwargs.get("model_name", "gpt2")  # "gpt2-medium")
         self.logit_temp = kwargs.get("logit_temp", 1.0)
         self.model = kwargs.get("model", None)
         self.enc = kwargs.get("enc", None)

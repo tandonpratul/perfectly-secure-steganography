@@ -6,9 +6,8 @@ import time
 import torch as th
 
 from mec import minimum_entropy_coupling
-from medium import ActionLabelException
-from utils import DRBG, kl2, entropy2
-
+from medium import ActionLabelException, METEORMedium, RandomMedium
+from utils import DRBG, kl2, entropy2, str2bit, bit2str
 
 class IMECEncoder:
 
@@ -320,10 +319,10 @@ def remove_random_mask(message_bits, input_key, sample_seed_prefix, input_nonce)
 
 if __name__ == "__main__":
     block_size = 4  # in bits
-    medium = METEORMedium(
+    medium = RandomMedium(
         seed=12342,
         temp=0.95,
-        probs_top_k=50  # severe entropy loss!
+        probs_top_k=40  # severe entropy loss!
     )
 
     plaintext_message = "bds04I7"
@@ -331,13 +330,15 @@ if __name__ == "__main__":
 
     # plaintext_message = "sample text"
     # use_arithmetic_coding = True
-
-    bit_msg, cinfo = str2bit(plaintext_message, use_arithmetic_coding=False, medium=medium)
+    
+    bit_msg = str2bit(plaintext_message, use_arithmetic_coding=False, medium=medium)
+    
+    print (bit_msg)
 
     mask_cfg = {"input_key": b'0x01' * 64,
                 "sample_seed_prefix": b'sample',
                 "input_nonce": b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'}
-    msg_bits, rinfo = apply_random_mask(bit_msg, **mask_cfg)
+    msg_bits = apply_random_mask(bit_msg, **mask_cfg)
 
     import math
 
@@ -348,7 +349,7 @@ if __name__ == "__main__":
                      "resistant systems, practical steganographic systems capable of embedding messages " \
                      "into realistic communication distributions, like text, do not exist."
     chosen_context += "\n\n"  # to add a little spacing
-    encoded_message, enc_stats = encoder.encode(msg_bits=msg_bits, context=chosen_context, verbose=True)
+    encoded_message, message, enc_stats = encoder.encode(msg_bits, chosen_context, True)
 
     print("ENCODED MESSAGE:")
     print(encoded_message)
@@ -356,10 +357,10 @@ if __name__ == "__main__":
     decoder = IMECDecoder(block_size=block_size, n_chunks=int(math.ceil(len(bit_msg) / block_size)), medium=medium,
                           clean_up_output=False)  # medium needs to support the logit() function
 
-    decoded_message, dec_stats = decoder.decode(encoded_msg=encoded_message, context=chosen_context)
+    decoded_message, dec_stats = decoder.decode(message, chosen_context)
 
-    bit_msg, rinfo = remove_random_mask(decoded_message, **rinfo)
-    decoded_message = bit2str(bit_msg, **cinfo)
+    bit_msg = remove_random_mask(decoded_message, **mask_cfg)
+    decoded_message = bit2str(bit_msg, use_arithmetic_coding=False, medium=medium)
 
     print("PLAINTEXT MESSAGE:")
     print(plaintext_message)

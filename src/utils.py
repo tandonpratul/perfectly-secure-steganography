@@ -9,7 +9,7 @@ import torch as th
 import torch.nn.functional as F
 import yaml
 
-from src.image_transformer import ImageTransformer
+from image_transformer import ImageTransformer
 import argparse
 
 def dict2namespace(config):
@@ -583,9 +583,9 @@ def get_model(seed=1234, model_name='gpt2', device='cuda'):
     torch.cuda.manual_seed(seed)
 
     enc = MeteorTokenizer.from_pretrained(model_name)
-    enc.unk_token = None
+    """enc.unk_token = None
     enc.bos_token = None
-    enc.eos_token = None
+    enc.eos_token = None"""
 
     model = GPT2LMHeadModel.from_pretrained(model_name)
     model.to(device)
